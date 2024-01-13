@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_home"
+        android:icon="@drawable/ic_house"
+        android:title="@string/title_home" />
+
+    <item
+        android:id="@+id/menu_subway"
+        android:icon="@drawable/ic_train_subway_solid"
+        android:title="@string/title_subway" />
+
+    <item
+        android:id="@+id/menu_user"
+        android:icon="@drawable/ic_user_solid"
+        android:title="@string/title_user" />
+
+</menu>

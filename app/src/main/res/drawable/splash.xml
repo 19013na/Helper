@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/splash_back" />
+    <!--로고 이미지를 넣을거임-->
+    <!--item으로 jpg만 넣을 수 있음.-->
+    <item
+        android:top="200dp"
+        android:gravity="center_horizontal">
+        <bitmap
+            android:src="@drawable/ic_subway"
+            android:gravity="top" />
+    </item>
+</layer-list>
