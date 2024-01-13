@@ -6,8 +6,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectapplication.databinding.FragmentSubwayBinding
+import com.google.android.material.internal.ViewUtils.hideKeyboard
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -50,24 +52,25 @@ class SubwayFragment : Fragment() {
 
             var keyword = binding.edtProduct.text.toString()    // 검색한 키워드 가져온다.
 
-            if (keyword.isNotEmpty()) {
-                val call: Call<MyModel> = MyApplication.networkService.getList(
-                    "6f6669585870686f3831586c724e6b",
-                    "json",
-                    1000,
-                )
+            val call: Call<MyModel> = MyApplication.networkService.getList(
+                "6f6669585870686f3831586c724e6b",
+                "json",
+                1000,
+            )
 
-                Log.d("mobileApp", "${call.request()}") // 오류 점검
+            Log.d("mobileApp", "${call.request()}") // 오류 점검
 
-                call?.enqueue(object : Callback<MyModel> {
-                    override fun onResponse(call: Call<MyModel>, response: Response<MyModel>) {
+            call?.enqueue(object : Callback<MyModel> {
+                override fun onResponse(call: Call<MyModel>, response: Response<MyModel>) {
+                    if (keyword.isNotEmpty()) {//
                         if (response.isSuccessful) {
                             // 추가
                             val originalList = response.body()?.SeoulMetroFaciInfo?.row
 
                             if (originalList != null) {
                                 // 필터링된 리스트 생성
-                                val filteredList = originalList.filter { it.containsKeyword(keyword) }
+                                val filteredList =
+                                    originalList.filter { it.containsKeyword(keyword) }
 
                                 // RecyclerView 어댑터 설정
                                 binding.retrofitRecyclerView.layoutManager =
@@ -78,21 +81,27 @@ class SubwayFragment : Fragment() {
                                 )
                             }
                         }
+                    } else{ //
+                        mutableList = mutableListOf<ItemSubwayModel>()  // 초기화
+                        binding.retrofitRecyclerView.layoutManager = LinearLayoutManager(context)
+                        binding.retrofitRecyclerView.adapter = MySubwayAdapter(requireContext(), response.body()!!.SeoulMetroFaciInfo.row)
                     }
-
+                }
                     override fun onFailure(call: Call<MyModel>, t: Throwable) {
                         Log.d("mobileApp", "${t.toString()}")
                     }
                 })
-            }
-                mutableList = mutableListOf<ItemSubwayModel>()  // 초기화
-                binding.retrofitRecyclerView.layoutManager = LinearLayoutManager(context)
-                binding.retrofitRecyclerView.adapter = MySubwayAdapter(requireContext(), mutableList)
+            hideKeyboard()
         }
-
         return binding.root
     }
-
+    private fun hideKeyboard() {
+        val view = activity?.currentFocus
+        if (view != null) {
+            val imm = activity?.getSystemService(InputMethodManager::class.java)
+            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
     companion object {
         /**
          * Use this factory method to create a new instance of
