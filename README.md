@@ -30,3 +30,8 @@ Helper는 지하철 승강기 정보를 제공하는 서비스입니다.
 - https://data.seoul.go.kr/dataList/OA-15994/S/1/datasetView.do
 
 <br>
+
+### 추가 설명
+2023년 6월에 했던 'Helper_Subway' 프로젝트의 부족한 부분, api를 수정할 예정입니다.
+
+<br>
