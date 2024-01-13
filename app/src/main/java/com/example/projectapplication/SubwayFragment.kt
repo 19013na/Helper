@@ -24,17 +24,19 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class SubwayFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+//    // TODO: Rename and change types of parameters
+//    private var param1: String? = null
+//    private var param2: String? = null
+//
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        arguments?.let {
+//            param1 = it.getString(ARG_PARAM1)
+//            param2 = it.getString(ARG_PARAM2)
+//        }
+//    }ARG_PARAM2
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private val modelItemSubway = ItemSubwayModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,34 +47,48 @@ class SubwayFragment : Fragment() {
         var mutableList: MutableList<ItemSubwayModel>
 
         binding.btnSearch.setOnClickListener {  // 검색버튼을 눌렀을 때,
+
             var keyword = binding.edtProduct.text.toString()    // 검색한 키워드 가져온다.
 
-            val call: Call<MyModel> = MyApplication.networkService.getList(
-                "6f6669585870686f3831586c724e6b",
-                "json",
-                1000,
-            )
+            if (keyword.isNotEmpty()) {
+                val call: Call<MyModel> = MyApplication.networkService.getList(
+                    "6f6669585870686f3831586c724e6b",
+                    "json",
+                    1000,
+                )
 
-            Log.d("mobileApp", "${call.request()}") // 오류 점검
+                Log.d("mobileApp", "${call.request()}") // 오류 점검
 
-            call?.enqueue(object: Callback<MyModel> {
-                override fun onResponse(call: Call<MyModel>, response: Response<MyModel>) {
-                    if(response.isSuccessful) {
-                        Log.d("mobileApp", "${response.body()}")    // 검사
-                        binding.retrofitRecyclerView.layoutManager = LinearLayoutManager(context)
-                        binding.retrofitRecyclerView.adapter = MySubwayAdapter(requireContext(), response.body()!!.SeoulMetroFaciInfo.row)
+                call?.enqueue(object : Callback<MyModel> {
+                    override fun onResponse(call: Call<MyModel>, response: Response<MyModel>) {
+                        if (response.isSuccessful) {
+                            // 추가
+                            val originalList = response.body()?.SeoulMetroFaciInfo?.row
+
+                            if (originalList != null) {
+                                // 필터링된 리스트 생성
+                                val filteredList = originalList.filter { it.containsKeyword(keyword) }
+
+                                // RecyclerView 어댑터 설정
+                                binding.retrofitRecyclerView.layoutManager =
+                                    LinearLayoutManager(context)
+                                binding.retrofitRecyclerView.adapter = MySubwayAdapter(
+                                    requireContext(),
+                                    if (filteredList.isNotEmpty()) filteredList else originalList
+                                )
+                            }
+                        }
                     }
-                }
 
-                override fun onFailure(call: Call<MyModel>, t: Throwable) {
-                    Log.d("mobileApp", "${t.toString()}")
-                }
-            })
+                    override fun onFailure(call: Call<MyModel>, t: Throwable) {
+                        Log.d("mobileApp", "${t.toString()}")
+                    }
+                })
+            }
+                mutableList = mutableListOf<ItemSubwayModel>()  // 초기화
+                binding.retrofitRecyclerView.layoutManager = LinearLayoutManager(context)
+                binding.retrofitRecyclerView.adapter = MySubwayAdapter(requireContext(), mutableList)
         }
-
-        mutableList = mutableListOf<ItemSubwayModel>()  // 초기화
-        binding.retrofitRecyclerView.layoutManager = LinearLayoutManager(context)
-        binding.retrofitRecyclerView.adapter = MySubwayAdapter(requireContext(), mutableList)
 
         return binding.root
     }

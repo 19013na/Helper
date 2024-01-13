@@ -9,8 +9,9 @@ import com.example.projectapplication.databinding.ItemSubwayBinding
 
 class MySubwayViewHolder(val binding: ItemSubwayBinding): RecyclerView.ViewHolder(binding.root)
 
-class MySubwayAdapter(val context: Context, val datas: MutableList<ItemSubwayModel>?): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MySubwayAdapter(val context: Context, var originaldatas: List<ItemSubwayModel>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    var datas: MutableList<ItemSubwayModel>? = originaldatas?.toMutableList()
     override fun getItemCount(): Int {
         return datas?.size ?: 0
     }
